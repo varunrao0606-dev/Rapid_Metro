@@ -14,7 +14,7 @@ save "GGN_NTL.dta", replace
 xtset ward year      
 
 
-* VARIABLE CONSTRUCTION
+* Variable Construction
 
 * Corrected treatment assignment:
 
@@ -42,7 +42,7 @@ gen first_treat = 0
 replace first_treat = 2013 if (ward == 34 | ward == 35)
 replace first_treat = 2017 if (ward == 32 | ward == 33)
 
-* BASELINE MODEL
+* Baseline Model
 eststo clear
 quietly xtreg true_ln_ntl phase1 phase2 i.year c.popdn#ib2012.year ///
     c.blr#ib2012.year c.bsws#ib2012.year, fe vce(cluster ward)
@@ -58,12 +58,12 @@ esttab Clear_Result using "Final_Results.rtf", replace ///
               "Controls for Year Fixed Effects and Baseline Interactions included.")
 
 
-* LAGGED-EFFECTS MODEL (2-year delay)
+* Lagged-Effects Model (2-year delay)
 
 xtreg true_ln_ntl phase1_lag2 phase2_lag2 i.year c.popdn#ib2012.year ///
     c.blr#ib2012.year c.bsws#ib2012.year, fe vce(cluster ward)
 
-* ROBUSTNESS CHECKS
+* Robustness Checks
 * a. In-space placebo: assigns a fake metro, from 2017, to wards 25 and 26, two untreated wards chosen to structurally resemble Golf Course Road
 gen fake_phase2_space = 0
 replace fake_phase2_space = 1 if (ward == 25 | ward == 26) & year >= 2017
@@ -92,7 +92,7 @@ esttab Placebo_Model Yellow_Line_Model using "Robustness_Checks.rtf", replace //
               "Both models include Ward and Year Fixed Effects, and Baseline Interactions.")
 
 
-* EVENT STUDY — CALLAWAY-SANT'ANNA (CS-DID)
+* Event Study - Callaway-Sant'Anna (CS-DID)
 csdid true_ln_ntl, ivar(ward) time(year) gvar(first_treat) method(dripw)
 estat event                          
 estat group                       
@@ -103,7 +103,7 @@ csdid_plot, title("Dynamic Treatment Effects of the Rapid Metro") ///
             note("Dashed line represents 95% Confidence Intervals")
 
 
-* GRAPH DESCRIPTIVE TRENDS BY WARD COHORT
+* Graph Descriptive Trends By Two Ward Cohort
 
 capture drop cohort
 gen cohort = 0                                   
@@ -133,7 +133,7 @@ graph export "Graph1_Radiance_Trends.png", replace
 restore
 
 
-* GRAPH SENSITIVITY FOREST PLOT
+* Graph Sensitivity Forest Plot
 quietly xtreg true_ln_ntl phase1_lag2 phase2_lag2 i.year c.popdn#ib2012.year ///
     c.blr#ib2012.year c.bsws#ib2012.year, fe vce(cluster ward)
 eststo Base_Lagged
