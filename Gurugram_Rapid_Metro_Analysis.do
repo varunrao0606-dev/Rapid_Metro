@@ -1,5 +1,5 @@
 
-* GURUGRAM RAPID METRO- SPATIAL DiD ANALYSIS
+* Gurugram Rapid Metro- Spatial DiD Analysis
 
 cd "/Users/varun/Desktop/econ policy/diss/quant/"
 
