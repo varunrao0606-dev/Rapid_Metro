@@ -1,0 +1,62 @@
+// Load uploaded asset 
+
+var wards = ee.FeatureCollection("users/varunrao0606/gurgaon_final");
+
+
+
+// Load VIIRS data
+
+var viirs = ee.ImageCollection("NOAA/VIIRS/DNB/MONTHLY_V1/VCMCFG")
+
+              .select('avg_rad');
+
+
+// Loop through 2012-2023
+
+var years = ee.List.sequence(2012, 2023);
+
+var panelData = ee.FeatureCollection(years.map(function(y) {
+
+  var start = ee.Date.fromYMD(y, 1, 1);
+
+  var end = start.advance(1, 'year');
+
+  var annualImage = viirs.filterDate(start, end).median();
+
+  
+
+  // Calculated the mean over the centroid of the ward.
+
+  // This bypasses geometry errors and ensures we always get a value.
+
+  return annualImage.reduceRegions({
+
+    collection: wards.map(function(f) { return f.setGeometry(f.geometry().centroid()) }),
+
+    reducer: ee.Reducer.mean(),
+
+    scale: 463
+
+  }).map(function(feature) {
+
+    return feature.set('Year', y);
+
+  });
+
+})).flatten();
+
+
+
+// Export
+
+Export.table.toDrive({
+
+  collection: panelData,
+
+  description: 'Gurgaon_Wards_Final_Centroid_Extraction',
+
+  fileFormat: 'CSV',
+
+  selectors: ['Year', 'sourceward', 'ward_lgd_n', 'mean']
+
+});
